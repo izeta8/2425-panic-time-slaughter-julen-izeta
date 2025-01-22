@@ -9,7 +9,20 @@ const getTime = async (req, res) => {
   }
 }
 
+const executeNextDay = async (req, res) => {
+  console.clear();
+  try {
+    // timeService.executeNextDay() returns an object with time and player data.
+    const returnData = await timeService.executeNextDay();
+    res.status(200).send({status: "OK", data: returnData});
+  } catch (error) {
+    res.status(500).send({status: "FAILED", error: error?.message})
+  }
+
+}
+
 
 module.exports = {
-  getTime
+  getTime,
+  executeNextDay
 }
