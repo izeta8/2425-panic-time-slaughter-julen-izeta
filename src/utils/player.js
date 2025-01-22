@@ -7,6 +7,7 @@ const attackTeammate = (attackingPlayer, totalDamageAttribute, players) => {
   const randomNumber = getRandomNumber(1, 100);
 
   if (randomNumber>attackingPlayer.stats.dexterity) {
+    print(`${attackingPlayer.name} wont attack anyone. `);
     return;
   }
 

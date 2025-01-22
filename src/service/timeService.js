@@ -26,7 +26,7 @@ const executeNextDay = async () => {
     if (!players || players.length === 0) {throw new Error("No player found in the database")}
 
     // Morning (5:00)
-    players = executeMorning(players);
+    players = await executeMorning(players);
 
     // Midday (12:00)
     const newDay = await executeMidday(time);
@@ -34,9 +34,6 @@ const executeNextDay = async () => {
 
     // Afternoon (17:00)
     players = await executeAfternoon(players);
-
-    printSubTitle("AFTER");
-    console.log(players);
 
     // Night (22:00)
 
@@ -72,9 +69,13 @@ const executeAfternoon = async (players) => {
   ordederPlayers.splice(selectedPlayerIndex, 1)
   ordederPlayers.unshift(jokerSelectedPlayer)
 
-  print(`${jokerSelectedPlayer.name} has been selected to start`);
+  const roundPlayers = players.filter(player => player.occupation !== "joker");
 
-  players = players.map(player => {
+  roundPlayers.forEach(player => {
+
+    if (player.occupation === "priest") {return player}
+
+    print(`\nIt is ${player.name}'s turn`);
 
     if (player.occupation === "mage")  {
       attackTeammate(player, "dexterity", players);
@@ -161,6 +162,8 @@ const executeAfternoon = async (players) => {
           // Remove the lost stone to the player
           randomTeammate.equipment.pouch.precious_stones.shift();
 
+          print(`${randomTeammate.name} has given ${stone.name} to ${player.name}.`);
+
         } else {
           print(`${randomTeammate.name} doesnt have any precious stone.`);
         }
@@ -179,6 +182,8 @@ const executeAfternoon = async (players) => {
           randomTeammate.equipment.pouch.precious_stones.push(stone);
           player.equipment.pouch.precious_stones.unshift();
 
+          print(`${player.name} has given ${stone.name} to ${randomTeammate.name}.`);
+
         } else {
           print(`${player.name} doesnt have any precious stone.`);
         }
@@ -186,11 +191,9 @@ const executeAfternoon = async (players) => {
 
     }
 
-
-    return player;
   });
 
-  print(`All the players will suffers a decrease of 2 points of stamina`);
+  print(`\nAll the players will suffers a decrease of 2 points of stamina`);
 
   return players.map(player => {
     player.stats.stamina-=2;
