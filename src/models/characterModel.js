@@ -12,17 +12,17 @@
     },
     equipment:{
         saddlebag:[
-          { type: mongoose.Schema.Types.ObjectId, ref: "saddlebag" },
+          { type: mongoose.Schema.Types.ObjectId, ref: "Saddlebag" },
         ],
         quiver: Number,
         weapons:[
-          { type: mongoose.Schema.Types.ObjectId, ref: "weapons" },
+          { type: mongoose.Schema.Types.ObjectId, ref: "Weapon" },
         ],
         pouch:{
           coins: Number,
           gold: Number,
           precious_stones:[
-            { type: mongoose.Schema.Types.ObjectId, ref: "preciousStones" },
+            { type: mongoose.Schema.Types.ObjectId, ref: "PreciousStone" },
           ]
         },
         miscellaneous: [String]
