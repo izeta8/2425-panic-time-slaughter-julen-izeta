@@ -5,6 +5,8 @@ const { getRandomNumber, getRandomElement, getLastElement, printTitle, printSubT
 const { getPreciousStones, getSaddleBags } = require("../utils/database")
 const { attackTeammate, stealItem, loseArrow } = require("../utils/player")
 
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 const getTime = async () => {
   try {
     const time = await Time.find();
@@ -17,11 +19,11 @@ const getTime = async () => {
 const executeNextDay = async () => {
 
   try {
-
-    printTitle("Executing ??? (?)")
-
+    
     let players = await getPlayers();
     let time = await getTime();
+
+    let currentDay = calculateCurrentDay(time);
 
     if (!players || players.length === 0) {throw new Error("No player found in the database")}
 
@@ -29,8 +31,8 @@ const executeNextDay = async () => {
     players = await executeMorning(players);
 
     // Midday (12:00)
-    const newDay = await executeMidday(time);
-    time.push(newDay);
+    currentDay = await executeMidday(currentDay, time);
+    time.push(currentDay);
 
     // Afternoon (17:00)
     players = await executeAfternoon(players);
@@ -202,19 +204,45 @@ const executeAfternoon = async (players) => {
 
 }
 
+const calculateCurrentDay = (time) => {
 
-const executeMidday = async (time) => {
+  // Calculate current weekname
+  const lastDay = getLastElement(time); 
+  const lastDayNameIndex = days.indexOf(lastDay.day_week);
+  
+  const currentDayIndex = lastDayNameIndex+1 === 7 ? 0 : lastDayNameIndex+1;
+  const currentDayName = days[currentDayIndex]; 
+
+  // Increase day number
+  const dayNumber = lastDay.day_number+1; 
+
+  printTitle(`${currentDayName} (Day ${dayNumber}) (${time.km_traveled}kms travelled)`);
+
+  const currentDay = {
+    day_number: dayNumber,
+    day_week: currentDayName,
+    km_traveled: time.km_traveled,
+    km_total: time.km_total
+  }
+
+  return currentDay;
+
+}
+
+
+const executeMidday = async (currentDay, time) => {
 
   printSubTitle("Midday (12:00)")
 
   const lastDay = getLastElement(time); 
-  const dayNumber = lastDay.day_number+1; 
-
   const traveledDistance = getRandomNumber(1,10);
 
+  print(`Players have walked ${traveledDistance} kms`);
+
+
   const newDay = {
-    day_number: dayNumber,
-    day_week: "???",
+    day_number: currentDay.day_number,
+    day_week: currentDay.day_week,
     km_traveled: traveledDistance,
     km_total: lastDay.km_total+traveledDistance
   }
